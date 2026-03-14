@@ -1,0 +1,37 @@
+﻿
+|-- .venv
+  |-- Include
+  |-- Lib
+    |-- site-packages
+  |-- Scripts
+|-- .vscode
+|-- config
+|-- doc
+  |-- 开发指南
+    |-- API参考
+    |-- 架构设计
+  |-- 快速开始
+  |-- 接口文档
+  |-- 架构设计
+  |-- 赛博监工
+  |-- 运维手册
+|-- NapCat.Shell
+  |-- cache
+  |-- config
+    |-- plugins
+  |-- logs
+  |-- native
+    |-- dpapi
+    |-- ffmpeg
+    |-- napi2native
+    |-- packet
+    |-- pty
+  |-- plugins
+    |-- napcat-plugin-builtin
+  |-- static
+    |-- assets
+    |-- fonts
+  |-- worker
+|-- src
+  |-- bot
+    |-- tests
