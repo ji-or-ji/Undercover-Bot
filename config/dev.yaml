@@ -1,4 +1,7 @@
-napcat_api: "http://127.0.0.1:3000"
+napcat:
+  onebot_api: "http://127.0.0.1:3000"
+  webui_port: 6099
+  auto_open_webui_after_login: true
 keywords:
   - "炸群"
   - "举报"

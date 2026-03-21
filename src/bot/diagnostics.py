@@ -1,7 +1,5 @@
-import os
 import asyncio
-import time
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 import httpx
 
@@ -33,25 +31,12 @@ class NapCatDiagnostics:
 
     async def probe_login_methods(self) -> Dict[str, Any]:
         summary: Dict[str, Any] = {}
-        # Quick login list
         quick_list = await self.manager.get_quick_login_list()
         summary["quick_list_count"] = len(quick_list) if isinstance(quick_list, list) else 0
 
-        # QR code fetch (without printing the QR)
         await self.manager._api_post("/QQLogin/RefreshQRcode")
         qr_res = await self.manager._api_post("/QQLogin/GetQQLoginQrcode")
-
-        qrcode_text: Optional[str] = None
-        if isinstance(qr_res.get("data"), dict):
-            qrcode_text = qr_res["data"].get("qrcode")
-        if not qrcode_text:
-            qrcode_text = qr_res.get("qrcode")
-        if not qrcode_text and isinstance(qr_res.get("text"), str) and "http" in qr_res["text"]:
-            txt = qr_res["text"]
-            start = txt.find("http")
-            end = txt.find("\n", start)
-            qrcode_text = txt[start:end] if end != -1 else txt[start:]
-
+        qrcode_text = self.manager._extract_qr_text(qr_res)
         summary["qrcode_available"] = True if qrcode_text else False
         return summary
 
@@ -91,4 +76,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-

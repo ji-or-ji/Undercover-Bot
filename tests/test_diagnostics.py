@@ -51,3 +51,17 @@ async def test_diagnostics_report():
         assert report["started"] is True
         assert report["webui"]["webui_html"] == 200
         assert report["login"]["qrcode_available"] is True
+
+
+@pytest.mark.asyncio
+async def test_probe_login_methods_with_qrcodeurl_field():
+    diag = NapCatDiagnostics()
+    diag.manager.get_quick_login_list = AsyncMock(return_value=[])
+    diag.manager._api_post = AsyncMock(side_effect=[
+        {"code": 0},
+        {"code": 0, "data": {"qrcodeurl": "http://qr-url"}},
+    ])
+
+    login = await diag.probe_login_methods()
+    assert login["quick_list_count"] == 0
+    assert login["qrcode_available"] is True

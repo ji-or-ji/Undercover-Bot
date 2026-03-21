@@ -1,4 +1,3 @@
-import yaml
 import os
 import asyncio
 from fastapi import FastAPI, Request
@@ -6,23 +5,23 @@ import httpx
 import uvicorn
 from typing import List, Dict, Optional
 try:
-    from src.bot.login import start_bot_with_login
+    from src.bot.login import start_bot_with_login, get_app_config
 except ModuleNotFoundError:
     import sys
     from pathlib import Path
     sys.path.append(str(Path(__file__).resolve().parents[2]))
-    from src.bot.login import start_bot_with_login
+    from src.bot.login import start_bot_with_login, get_app_config
 
-# 加载配置
 def load_config(env: str = "dev") -> Dict:
-    config_path = f"config/{env}.yaml"
-    if not os.path.exists(config_path):
-        return {}
-    with open(config_path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
+    return get_app_config(env)
 
 config = load_config(os.getenv("APP_ENV", "dev"))
-NAPCAT_API = config.get("napcat_api", "http://127.0.0.1:5700")
+napcat_config = config.get("napcat") if isinstance(config.get("napcat"), dict) else {}
+NAPCAT_API = (
+    napcat_config.get("onebot_api") if napcat_config else None
+    or config.get("napcat_api")
+    or "http://127.0.0.1:3000"
+)
 KEYWORDS = config.get("keywords", ["炸群", "举报", "兄弟们"])
 
 app = FastAPI()
@@ -72,4 +71,7 @@ async def main():
     await server.serve()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        print("\n程序已中断，正在退出。")
