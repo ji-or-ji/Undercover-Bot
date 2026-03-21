@@ -27,8 +27,6 @@ share/python-wheels/
 MANIFEST
 
 # PyInstaller
-#  通常这些文件由Python脚本从模板写入
-#  在PyInstaller构建exe之前，以便注入日期/其他信息。
 *.manifest
 *.spec
 
@@ -49,6 +47,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+\.pytest_cache_v2/
 cover/
 
 # 翻译文件
@@ -137,8 +136,12 @@ dmypy.json
 # Cython调试符号
 cython_debug/
 
-#NapCat本体
+# NapCat 本体及敏感配置
 NapCat.Shell/
+/NapCat.Shell/config/*.json
+/NapCat.Shell/config/passkey.json
+/NapCat.Shell/logs/
+/NapCat.Shell/cache/
 
 #draw.io 的临时文件
 .$*.drawio.bkp

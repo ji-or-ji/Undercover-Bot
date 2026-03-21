@@ -1,9 +1,17 @@
 import yaml
 import os
+import asyncio
 from fastapi import FastAPI, Request
 import httpx
 import uvicorn
 from typing import List, Dict, Optional
+try:
+    from src.bot.login import start_bot_with_login
+except ModuleNotFoundError:
+    import sys
+    from pathlib import Path
+    sys.path.append(str(Path(__file__).resolve().parents[2]))
+    from src.bot.login import start_bot_with_login
 
 # 加载配置
 def load_config(env: str = "dev") -> Dict:
@@ -51,5 +59,17 @@ async def receive_message(request: Request):
             await send_group_msg(group_id, reply)
     return {"status": "ok"}
 
+async def main():
+    if os.getenv("SKIP_LOGIN") == "1":
+        return
+    success = await start_bot_with_login()
+    if not success:
+        print("登录失败，程序退出。")
+        return
+
+    config_uvicorn = uvicorn.Config(app, host="0.0.0.0", port=8000)
+    server = uvicorn.Server(config_uvicorn)
+    await server.serve()
+
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    asyncio.run(main())

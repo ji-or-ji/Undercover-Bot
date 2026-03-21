@@ -1,4 +1,4 @@
-napcat_api: "http://localhost:5700"
+napcat_api: "http://0.0.0.0:8000"
 keywords:
   - "炸群"
   - "举报"
