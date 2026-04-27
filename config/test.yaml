@@ -2,7 +2,18 @@ napcat:
   onebot_api: "http://0.0.0.0:8000"
   webui_port: 6099
   auto_open_webui_after_login: true
+  bot_qq: 0
 keywords:
   - "炸群"
   - "举报"
   - "兄弟们"
+repeater:
+  keywords:
+    - "炸群"
+    - "举报"
+    - "兄弟们"
+  match_type: "exact"
+  reply_template: "收到关键词【{keyword}】，已记录"
+  reply_strategy: "separate"
+  retry_max_attempts: 3
+  retry_base_delay: 1.0

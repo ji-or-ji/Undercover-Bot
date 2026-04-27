@@ -1,3 +1,4 @@
+# from fastapi import logger
 import os
 import json
 import subprocess
@@ -12,12 +13,16 @@ import re
 from urllib.parse import quote
 from pathlib import Path
 from typing import List, Dict, Optional, Any
+import logging
+# 导入logging模块，用于记录日志
+import logging
 
 # 获取项目根目录
-ROOT_DIR = Path(__file__).parent.parent.parent
-NAPCAT_DIR = ROOT_DIR / "NapCat.Shell"
+ROOT_DIR = Path(__file__).parent.parent.parent    # 项目根目录
+NAPCAT_DIR = ROOT_DIR / "NapCat.Shell"   
 WEBUI_CONFIG_PATH = NAPCAT_DIR / "config" / "webui.json"
 
+# 获取应用配置
 def get_app_config(env: Optional[str] = None) -> Dict[str, Any]:
     target_env = env or os.getenv("APP_ENV", "dev")
     config_path = ROOT_DIR / "config" / f"{target_env}.yaml"
@@ -154,7 +159,7 @@ class NapCatLoginManager:
                     self.webui_credential = credential
                     return True
         except Exception as e:
-            print(f"WebUI 鉴权失败: {e}")
+                    logging.getLogger("NapCatLoginManager").error(f"WebUI 鉴权失败: {e}")
         return False
 
     async def _post_with_token(self, url: str, payload: Dict[str, Any], auth_token: Optional[str]):
@@ -190,12 +195,12 @@ class NapCatLoginManager:
                     return result
             return {"code": -1, "message": "Unauthorized", "data": None, "url": url}
         except Exception as e:
-            print(f"API 请求失败 [{endpoint}]: {e}")
+            logging.getLogger("NapCatLoginManager").error(f"API 请求失败 [{endpoint}]: {e}")
             return {"code": -1, "message": str(e), "data": None}
 
     async def wait_for_ready(self, timeout=30):
         """等待 WebUI 就绪"""
-        print(f"正在检测 NapCat WebUI 是否就绪 (http://127.0.0.1:{self.port})...")
+        logging.getLogger("NapCatLoginManager").info(f"正在检测 NapCat WebUI 是否就绪 (http://127.0.0.1:{self.port})...")
         start_time = time.time()
         while time.time() - start_time < timeout:
             try:
@@ -222,7 +227,7 @@ class NapCatLoginManager:
         if not bat_path.exists():
             raise FileNotFoundError(f"找不到启动脚本: {bat_path}")
         
-        print(f"正在启动 NapCat 服务: {bat_path}")
+        logging.getLogger("NapCatLoginManager").info(f"正在启动 NapCat 服务: {bat_path}")
         # 在 Windows 上使用 subprocess.Popen 启动服务
         # 使用 shell=True 并在新的终端窗口启动，以便用户观察日志（可选）
         # 这里我们直接启动，不阻塞
@@ -270,8 +275,8 @@ class NapCatLoginManager:
         qr.make(fit=True)
         # 使用 ascii 字符在终端打印
         qr.print_ascii(invert=True)
-        print(f"\n请使用手机 QQ 扫描上方二维码登录")
-        print(f"原始链接: {qr_text}")
+        logging.getLogger("NapCatLoginManager").info(f"\n请使用手机 QQ 扫描上方二维码登录")
+        logging.getLogger("NapCatLoginManager").info(f"原始链接: {qr_text}")
 
     def open_webui_if_enabled(self):
         if not self.auto_open_webui_after_login:
@@ -279,9 +284,9 @@ class NapCatLoginManager:
         webui_url = self._resolve_webui_open_url()
         try:
             webbrowser.open(webui_url)
-            print(f"已自动打开 NapCat WebUI: {webui_url}")
+            logging.getLogger("NapCatLoginManager").info(f"已自动打开 NapCat WebUI: {webui_url}")
         except Exception as e:
-            print(f"自动打开 NapCat WebUI 失败: {e}")
+            logging.getLogger("NapCatLoginManager").error(f"自动打开 NapCat WebUI 失败: {e}")
 
     def _resolve_webui_open_url(self) -> str:
         log_panel_url = self._get_webui_panel_url_from_logs()
